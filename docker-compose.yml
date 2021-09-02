@@ -1,29 +1,26 @@
-version: '3'
+version: '3.8'
 
 services:
-  node-api:
-    build: .
-    command: npm start
-    depends_on:
-      - 'mysql'
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - 3000:3000
     volumes:
       - .:/usr/app
-  mysql:
-    image: mysql
+    depends_on:
+      - mysql_server
+
+  mysql_server:
+    image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-    restart: always
     environment:
-      LANG: C.UTF-8
-      MYSQL_DATABASE: midway_challenge
-      MYSQL_USER: 'admin'
-      MYSQL_PASSWORD: 'admin'
+      MYSQL_DATABASE: 'midway_challenge'
+      MYSQL_USER: 'app_user'
+      MYSQL_PASSWORD: 'my_secret'
       MYSQL_ROOT_PASSWORD: 'root'
+      LANG: C.UTF-8
       TZ: America/Sao_Paulo
-    ports:
-      - '3306:3306'
     volumes:
       - './scripts:/docker-entrypoint-initdb.d'
-    expose:
-      - '3306'
