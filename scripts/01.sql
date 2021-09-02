@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS Products(
 
 INSERT INTO Products(nome, valor, estoque, tamanho, tipo, descricao, dataCadastro) VALUES ("Calça", "100.00", 5, "M", "Jeans", "Calça Jeans", now());
 INSERT INTO Products(nome, valor, estoque, tamanho, tipo, descricao, dataCadastro) VALUES ("Calça", "100.00", 3, "m", "Jeans", "Calça Jeans m", now());
+INSERT INTO Products(nome, valor, estoque, tamanho, tipo, descricao, dataCadastro) VALUES ("Camiseta", "50.00", 3, "m", "Algodão", "Camiseta de algodão", now());
