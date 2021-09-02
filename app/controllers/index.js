@@ -1,38 +1,64 @@
+const moment = require('moment-timezone');
 const ProdutosDao = require('../dao/ProdutosDao');
 const connFactory = require('../conectionFactory');
 
-module.exports = (app) => {
-  app.get('/produtos', async (req, res) => {
-    try {
-      const conn = await connFactory();
-      const produtosDao = new ProdutosDao(conn);
+const getProducts = async (req, res) => {
+  try {
+    const conn = await connFactory();
+    const produtosDao = new ProdutosDao(conn);
 
-      const [rows] = await produtosDao.getAll();
+    const [rows] = await produtosDao.getAll();
 
-      res.status(200).json(rows);
+    res.status(200).json(rows);
 
-      conn.end();
-    } catch (error) {
-      res.status(500).json({ error });
-    }
-  });
-
-  //   app.get('/produtos/form', (req, res) => {
-  //     res.render('produtos/form');
-  //   });
-
-  //   app.post('/produtos', (req, res) => {
-  //     const connection = connectionFactory();
-  //     const livro = req.body;
-  //     const livrosDao = new ProdutosDao(connection);
-  //     console.log(livro);
-
-  //     livrosDao.save(livro, (err) => {
-  //       if (err) {
-  //         console.log(err);
-  //       }
-
-  //       res.redirect('/produtos');
-  //     });
-  //   });
+    conn.end();
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 };
+
+const getProductsById = async (req, res) => {
+  try {
+    const {
+      params: { id },
+    } = req;
+
+    const conn = await connFactory();
+    const produtosDao = new ProdutosDao(conn);
+
+    const [rows] = await produtosDao.getById(id);
+
+    res.status(200).json(rows);
+
+    conn.end();
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
+const createProduct = async (req, res, next) => {
+  try {
+    const { body } = req;
+    let data = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
+    body.dataCadastro = data;
+
+    const conn = await connFactory();
+    const produtosDao = new ProdutosDao(conn);
+
+    await produtosDao.save(body);
+
+    res.status(202).send('Produto criado com sucesso');
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getProducts,
+  getProductsById,
+  createProduct,
+};
+
+//   app.get('/produtos/form', (req, res) => {
+//     res.render('produtos/form');
+//   });
