@@ -5,7 +5,7 @@ class ProdutosDao {
 
   async getAll() {
     try {
-      return await this.connection.query('SELECT * FROM Products');
+      return await this.connection.query('SELECT * FROM Produtos');
     } catch (error) {
       console.log(error);
       throw error;
