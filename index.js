@@ -1,22 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const consign = require('consign');
-require('dotenv').config();
+const routes = require('./app/routes');
+const middlewares = require('./app/middlewares');
 
 const app = express();
-
-app.use(cors());
-app.disable('x-powered-by');
 
 const port = process.env.PORT || 3000;
 
 const host = '0.0.0.0';
 
-app.get('/', (req, res) => {
-  res.status(200).json({ error: false, data: { message: 'Teste' } });
-});
-
-consign().include('./app/controllers').into(app);
+app.use(cors());
+app.disable('x-powered-by');
 
 app.use(express.json());
 app.use(
@@ -24,6 +19,14 @@ app.use(
     extended: true,
   })
 );
+
+app.get('/', (_req, res) => {
+  res.status(200).send('It works');
+});
+
+app.use(routes);
+
+app.use(middlewares.errorMiddleware);
 
 app.listen(port, host);
 
