@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const routes = require('./app/routes');
 const middlewares = require('./app/middlewares');
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger_output.json');
 
 const app = express();
 
@@ -21,10 +23,14 @@ app.use(
 );
 
 app.get('/', (_req, res) => {
+  // #swagger.description = 'Root route, healthcheck'
+
   res.status(200).send('It works');
 });
 
 app.use(routes);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use(middlewares.errorMiddleware);
 
