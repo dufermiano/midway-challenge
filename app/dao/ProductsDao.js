@@ -20,6 +20,13 @@ class ProductsDao {
     );
   }
 
+  async getProductByInvoiceId(invoiceId) {
+    return await this.connection.query(
+      'SELECT PRO.inventory, PRO.id FROM PRODUCTS AS PRO INNER JOIN PURCHASE AS PUR ON PRO.id = PUR.productId WHERE PUR.invoiceId = ?',
+      invoiceId
+    );
+  }
+
   async save(product) {
     if (!product.id) {
       console.log('PRODUCT INSERT OPERATION');

@@ -14,10 +14,8 @@ router.patch(
   controllers.updateProduct
 );
 router.delete('/products/remove-duplicates', controllers.removeDuplicates);
-router.post(
-  '/products/purchase',
-  middlewares.purchaseSchema,
-  controllers.purchase
-);
+router.post('/purchase', middlewares.purchaseSchema, controllers.purchase);
+
+router.patch('/purchase/devolution/:invoiceId', controllers.devolution);
 
 module.exports = router;

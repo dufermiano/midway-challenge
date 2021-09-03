@@ -9,7 +9,7 @@ class PurchaseDao {
 
   async getById(invoiceId) {
     return await this.connection.query(
-      'SELECT * FROM PURCHASE WHERE invoiceId = ?',
+      'SELECT id, invoiceId, productId, isActive FROM PURCHASE WHERE invoiceId = ? AND isActive = 1',
       invoiceId
     );
   }

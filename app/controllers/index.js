@@ -183,6 +183,59 @@ const purchase = async (req, res, next) => {
   }
 };
 
+const devolution = async (req, res, next) => {
+  try {
+    const {
+      params: { invoiceId },
+    } = req;
+    const conn = await connFactory();
+    const purchaseDao = new PurchaseDao(conn);
+
+    const [rows] = await purchaseDao.getById(invoiceId);
+
+    const purchaseRows = Object.values(JSON.parse(JSON.stringify(rows)));
+
+    if (purchaseRows.length === 0) {
+      res.status(statusCode.NotFound).send({
+        message: errorMessages.invoiceNotFound,
+      });
+
+      conn.end();
+    } else {
+      const invoice = Object.assign(...purchaseRows);
+      const productsDao = new ProductsDao(conn);
+
+      const [rows] = await productsDao.getProductByInvoiceId(invoice.invoiceId);
+
+      const product = Object.assign(...rows);
+
+      if (product.length === 0) {
+        res.status(statusCode.NotFound).send({
+          message: errorMessages.productNotFound,
+        });
+
+        conn.end();
+      }
+
+      invoice.isActive = 0;
+
+      ++product.inventory;
+
+      await purchaseDao.save(invoice);
+
+      // update product inventory
+      await productsDao.save(product);
+
+      res.status(statusCode.Success).send({
+        message: messages.successDevolution,
+      });
+      conn.end();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductsById,
@@ -190,4 +243,5 @@ module.exports = {
   updateProduct,
   removeDuplicates,
   purchase,
+  devolution,
 };
