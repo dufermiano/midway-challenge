@@ -53,7 +53,7 @@ const productsToUpdateSchema = (req, res, next) => {
 const purchaseSchema = (req, res, next) => {
   const schema = Joi.object({
     productId: Joi.number().required(),
-    customerCPF: Joi.string().required(),
+    customerCPF: Joi.string().required().max(14),
   }).required();
 
   validateRequest(req, res, next, schema);

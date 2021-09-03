@@ -22,11 +22,11 @@ class ProductsDao {
 
   async save(product) {
     if (!product.id) {
-      console.log('INSERT OPERATION');
+      console.log('PRODUCT INSERT OPERATION');
       return await this.connection.query('INSERT INTO PRODUCTS SET ?', product);
     }
 
-    console.log('UPDATE OPERATION');
+    console.log('PRODUCT UPDATE OPERATION');
 
     return await this.connection.query('UPDATE PRODUCTS SET ? WHERE id = ?', [
       product,

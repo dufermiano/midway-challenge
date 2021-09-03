@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 const ProductsDao = require('../dao/ProductsDao');
+const PurchaseDao = require('../dao/PurchaseDao');
 const connFactory = require('../conectionFactory');
 const statusCode = require('../constants/statusCode');
 const { getUniquesAndSanitize, generateInvoice } = require('../helpers');
@@ -150,13 +151,17 @@ const purchase = async (req, res, next) => {
 
       const invoice = await generateInvoice(product.id, body.customerCPF);
 
-      body.dateOfPurchase = invoice.dateOfPurchase;
+      invoice.isActive = 1;
 
       --product.inventory;
       delete product.registrationDate;
       delete product.updateDate;
 
       // create purchase
+
+      const purchaseDao = new PurchaseDao(conn);
+
+      await purchaseDao.save(invoice);
 
       // update product inventory
       await productsDao.save(product);
@@ -169,7 +174,6 @@ const purchase = async (req, res, next) => {
           productName: product.name,
           productSize: product.size,
           productDescription: product.description,
-          productInventory: product.inventory,
         },
       });
       conn.end();
