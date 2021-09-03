@@ -50,6 +50,15 @@ const productsToUpdateSchema = (req, res, next) => {
   validateRequest(req, res, next, schema);
 };
 
+const purchaseSchema = (req, res, next) => {
+  const schema = Joi.object({
+    productId: Joi.number().required(),
+    customerCPF: Joi.string().required(),
+  }).required();
+
+  validateRequest(req, res, next, schema);
+};
+
 // eslint-disable-next-line no-unused-vars
 const errorMiddleware = (_error, _req, res, _next) => {
   console.log(errorMessages.serverError, _error);
@@ -60,4 +69,9 @@ const errorMiddleware = (_error, _req, res, _next) => {
   });
 };
 
-module.exports = { productsSchema, errorMiddleware, productsToUpdateSchema };
+module.exports = {
+  productsSchema,
+  errorMiddleware,
+  productsToUpdateSchema,
+  purchaseSchema,
+};

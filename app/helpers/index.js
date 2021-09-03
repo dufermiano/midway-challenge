@@ -1,5 +1,7 @@
 const moment = require('moment-timezone');
-const getUniquesAndSanitize = (source) => {
+const { v4: uuidv4 } = require('uuid');
+
+const getUniquesAndSanitize = async (source) => {
   // const idsToDelete = [];
   let idsToUpdate = [];
 
@@ -58,6 +60,16 @@ const getUniquesAndSanitize = (source) => {
   };
 };
 
+const generateInvoice = async (productId, customerCPF) => {
+  return {
+    invoiceId: uuidv4(),
+    productId,
+    customerCPF,
+    dateOfPurchase: moment.tz(process.env.TIMEZONE_SAO_PAULO).format(),
+  };
+};
+
 module.exports = {
   getUniquesAndSanitize,
+  generateInvoice,
 };

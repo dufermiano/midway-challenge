@@ -2,8 +2,8 @@ const moment = require('moment-timezone');
 const ProductsDao = require('../dao/ProductsDao');
 const connFactory = require('../conectionFactory');
 const statusCode = require('../constants/statusCode');
-const { getUniquesAndSanitize } = require('../helpers');
-const { messages } = require('../constants/messages');
+const { getUniquesAndSanitize, generateInvoice } = require('../helpers');
+const { messages, errorMessages } = require('../constants/messages');
 
 const getProducts = async (req, res, next) => {
   try {
@@ -91,7 +91,9 @@ const removeDuplicates = async (req, res, next) => {
 
     const _rows = Object.values(JSON.parse(JSON.stringify(rows)));
 
-    const { sanitizedProducts, idsToUpdate } = getUniquesAndSanitize(_rows);
+    const { sanitizedProducts, idsToUpdate } = await getUniquesAndSanitize(
+      _rows
+    );
 
     const productsToUpdate = sanitizedProducts.filter((product) => {
       if (idsToUpdate.includes(product.id)) {
@@ -117,10 +119,71 @@ const removeDuplicates = async (req, res, next) => {
   }
 };
 
+const purchase = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const conn = await connFactory();
+    const productsDao = new ProductsDao(conn);
+
+    const [rows] = await productsDao.getById(body.productId);
+
+    const _rows = Object.values(JSON.parse(JSON.stringify(rows)));
+
+    if (_rows.length === 0) {
+      res.status(statusCode.NotFound).send({
+        message: errorMessages.productNotFound,
+      });
+
+      conn.end();
+    }
+
+    const hasProduct = _rows.find((product) => product.inventory > 0);
+
+    if (!hasProduct) {
+      res.status(statusCode.Success).send({
+        message: messages.productHasNoInventory,
+      });
+
+      conn.end();
+    } else {
+      const product = Object.assign(..._rows);
+
+      const invoice = await generateInvoice(product.id, body.customerCPF);
+
+      body.dateOfPurchase = invoice.dateOfPurchase;
+
+      --product.inventory;
+      delete product.registrationDate;
+      delete product.updateDate;
+
+      // create purchase
+
+      // update product inventory
+      await productsDao.save(product);
+
+      res.status(statusCode.Created).send({
+        message: messages.successPurchase,
+        invoice,
+        productPurchased: {
+          productId: product.id,
+          productName: product.name,
+          productSize: product.size,
+          productDescription: product.description,
+          productInventory: product.inventory,
+        },
+      });
+      conn.end();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductsById,
   createProduct,
   updateProduct,
   removeDuplicates,
+  purchase,
 };

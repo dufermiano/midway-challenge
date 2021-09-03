@@ -14,5 +14,10 @@ router.patch(
   controllers.updateProduct
 );
 router.delete('/products/remove-duplicates', controllers.removeDuplicates);
+router.post(
+  '/products/purchase',
+  middlewares.purchaseSchema,
+  controllers.purchase
+);
 
 module.exports = router;
