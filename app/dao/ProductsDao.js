@@ -4,12 +4,13 @@ class ProductsDao {
   }
 
   async getAll() {
-    try {
-      return await this.connection.query('SELECT * FROM PRODUCTS');
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+    return await this.connection.query('SELECT * FROM PRODUCTS');
+  }
+
+  async getDuplicates() {
+    return await this.connection.query(
+      'SELECT LOWER(name) as name, value, LOWER(size) as size, LOWER(type) as type, COUNT(name) as duplicates, SUM(inventory) as total_inventory FROM PRODUCTS GROUP BY name, value, size, type HAVING COUNT(name) > 1'
+    );
   }
 
   async getById(id) {

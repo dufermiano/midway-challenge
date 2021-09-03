@@ -13,6 +13,6 @@ router.patch(
   middlewares.productsToUpdateSchema,
   controllers.updateProduct
 );
-router.put('/products/remove-duplicates');
+router.delete('/products/remove-duplicates', controllers.removeDuplicates);
 
 module.exports = router;

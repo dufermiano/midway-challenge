@@ -81,9 +81,25 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
+const removeDuplicates = async (req, res, next) => {
+  try {
+    const conn = await connFactory();
+    const productsDao = new ProductsDao(conn);
+
+    const [rows] = await productsDao.getDuplicates();
+
+    res.status(statusCode.Success).json(rows);
+
+    conn.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductsById,
   createProduct,
   updateProduct,
+  removeDuplicates,
 };
