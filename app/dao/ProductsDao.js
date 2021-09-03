@@ -20,8 +20,8 @@ class ProductsDao {
     );
   }
 
-  async save(product, id) {
-    if (!id) {
+  async save(product) {
+    if (!product.id) {
       console.log('INSERT OPERATION');
       return await this.connection.query('INSERT INTO PRODUCTS SET ?', product);
     }
@@ -30,8 +30,14 @@ class ProductsDao {
 
     return await this.connection.query('UPDATE PRODUCTS SET ? WHERE id = ?', [
       product,
-      id,
+      product.id,
     ]);
+  }
+
+  async delete() {
+    return await this.connection.query(
+      'DELETE p1 FROM PRODUCTS p1 INNER JOIN PRODUCTS p2 WHERE p1.id > p2.id AND p1.name = p2.name AND p1.value = p2.value AND p1.size = p2.size AND p1.type = p2.type'
+    );
   }
 }
 
