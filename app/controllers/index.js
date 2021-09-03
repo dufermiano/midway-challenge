@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 const ProductsDao = require('../dao/ProductsDao');
 const connFactory = require('../conectionFactory');
 const statusCode = require('../constants/statusCode');
+const { getUniquesAndSanitize } = require('../helpers');
 const { messages } = require('../constants/messages');
 
 const getProducts = async (req, res, next) => {
@@ -86,9 +87,29 @@ const removeDuplicates = async (req, res, next) => {
     const conn = await connFactory();
     const productsDao = new ProductsDao(conn);
 
-    const [rows] = await productsDao.getDuplicates();
+    const [rows] = await productsDao.getAll();
 
-    res.status(statusCode.Success).json(rows);
+    const _rows = Object.values(JSON.parse(JSON.stringify(rows)));
+
+    const { sanitizedProducts, idsToUpdate } = getUniquesAndSanitize(_rows);
+
+    const productsToUpdate = sanitizedProducts.filter((product) => {
+      if (idsToUpdate.includes(product.id)) {
+        return product;
+      }
+    });
+
+    // update products that was duplicated
+    await productsToUpdate.map(async (productToUpdate) => {
+      await productsDao.save(productToUpdate);
+    });
+
+    // remove duplicates
+    await productsDao.delete();
+
+    res
+      .status(statusCode.Success)
+      .json({ productsBeforeSanitize: _rows, sanitizedProducts });
 
     conn.end();
   } catch (error) {
