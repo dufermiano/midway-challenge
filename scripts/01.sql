@@ -13,3 +13,6 @@ CREATE TABLE IF NOT EXISTS PRODUCTS(
 INSERT INTO PRODUCTS(name, value, inventory, size, type, description, registrationDate) VALUES ("Calça", "100.00", 5, "M", "Jeans", "Calça Jeans", now());
 INSERT INTO PRODUCTS(name, value, inventory, size, type, description, registrationDate) VALUES ("Calça", "100.00", 3, "m", "Jeans", "Calça Jeans m", now());
 INSERT INTO PRODUCTS(name, value, inventory, size, type, description, registrationDate) VALUES ("Camiseta", "50.00", 3, "m", "Algodão", "Camiseta de algodão", now());
+
+INSERT INTO PRODUCTS(name, value, inventory, size, type, description, registrationDate) VALUES ("Camiseta", "50.00", 2, "m", "Algodão", "Camiseta de algodão", now());
+INSERT INTO PRODUCTS(name, value, inventory, size, type, description, registrationDate) VALUES ("Camiseta", "50.00", 1, "m", "Algodão", "Camiseta de algodão", now());
