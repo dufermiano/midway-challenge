@@ -5,13 +5,14 @@ const router = Router();
 const controllers = require('../controllers');
 const middlewares = require('../middlewares');
 
-router.get('/produtos', controllers.getProducts);
-router.get('/produtos/:id', controllers.getProductsById);
-router.post('/produtos', middlewares.productsSchema, controllers.createProduct);
-router.put(
-  '/produtos/:id',
+router.get('/products', controllers.getProducts);
+router.get('/products/:id', controllers.getProductsById);
+router.post('/products', middlewares.productsSchema, controllers.createProduct);
+router.patch(
+  '/products/:id',
   middlewares.productsToUpdateSchema,
   controllers.updateProduct
 );
+router.put('/products/remove-duplicates');
 
 module.exports = router;
