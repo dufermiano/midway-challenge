@@ -3,7 +3,11 @@ const messages = {
   productUpdated: 'Produto alterado com sucesso.',
 };
 
-const errorMessages = {};
+const errorMessages = {
+  internalError:
+    'Ocorreu um erro em nossos sistemas. Tente novamente mais tarde.',
+  serverError: 'An internal error occurred: ',
+};
 
 module.exports = {
   messages,

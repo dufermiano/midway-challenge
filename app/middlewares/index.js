@@ -1,11 +1,12 @@
 const Joi = require('joi');
 const statusCode = require('../constants/statusCode');
+const { errorMessages } = require('../constants/messages');
 
 const validateRequest = (req, res, next, schema) => {
   const options = {
-    abortEarly: false, // include all errors
-    allowUnknown: true, // ignore unknown props
-    stripUnknown: true, // remove unknown props
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: true,
   };
   const { error, value } = schema.validate(req.body, options);
   if (error) {
@@ -23,12 +24,12 @@ const validateRequest = (req, res, next, schema) => {
 
 const productsSchema = (req, res, next) => {
   const schema = Joi.object({
-    nome: Joi.string().required(),
-    valor: Joi.number().required(),
-    estoque: Joi.number().integer().required(),
-    tamanho: Joi.string().max(3).required(),
-    tipo: Joi.string().required(),
-    descricao: Joi.string().required(),
+    name: Joi.string().required(),
+    value: Joi.number().required(),
+    inventory: Joi.number().integer().required(),
+    size: Joi.string().max(3).required(),
+    type: Joi.string().required(),
+    description: Joi.string().required(),
   }).required();
 
   validateRequest(req, res, next, schema);
@@ -36,12 +37,12 @@ const productsSchema = (req, res, next) => {
 
 const productsToUpdateSchema = (req, res, next) => {
   const schema = Joi.object({
-    nome: Joi.string(),
-    valor: Joi.number(),
-    estoque: Joi.number().integer(),
-    tamanho: Joi.string().max(3),
-    tipo: Joi.string(),
-    descricao: Joi.string(),
+    name: Joi.string(),
+    value: Joi.number(),
+    inventory: Joi.number().integer(),
+    size: Joi.string().max(3),
+    type: Joi.string(),
+    description: Joi.string(),
   })
     .required()
     .min(1);
@@ -51,11 +52,11 @@ const productsToUpdateSchema = (req, res, next) => {
 
 // eslint-disable-next-line no-unused-vars
 const errorMiddleware = (_error, _req, res, _next) => {
-  console.log('Ocorreu um erro interno: ', _error);
+  console.log(errorMessages.serverError, _error);
 
   res.status(statusCode.InternalServerError).send({
     error: true,
-    message: 'Ocorreu um erro em nossos sistemas. Tente novamente mais tarde.',
+    message: errorMessages.internalError,
   });
 };
 

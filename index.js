@@ -30,4 +30,4 @@ app.use(middlewares.errorMiddleware);
 
 app.listen(port, host);
 
-console.log('Servidor escutando a porta', port);
+console.log('Server listening to port', port);

@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-const ProdutosDao = require('../dao/ProdutosDao');
+const ProductsDao = require('../dao/ProductsDao');
 const connFactory = require('../conectionFactory');
 const statusCode = require('../constants/statusCode');
 const { messages } = require('../constants/messages');
@@ -7,9 +7,9 @@ const { messages } = require('../constants/messages');
 const getProducts = async (req, res, next) => {
   try {
     const conn = await connFactory();
-    const produtosDao = new ProdutosDao(conn);
+    const productsDao = new ProductsDao(conn);
 
-    const [rows] = await produtosDao.getAll();
+    const [rows] = await productsDao.getAll();
 
     res.status(statusCode.Success).json(rows);
 
@@ -26,9 +26,9 @@ const getProductsById = async (req, res, next) => {
     } = req;
 
     const conn = await connFactory();
-    const produtosDao = new ProdutosDao(conn);
+    const productsDao = new ProductsDao(conn);
 
-    const [rows] = await produtosDao.getById(id);
+    const [rows] = await productsDao.getById(id);
 
     res.status(statusCode.Success).json(rows);
 
@@ -41,17 +41,18 @@ const getProductsById = async (req, res, next) => {
 const createProduct = async (req, res, next) => {
   try {
     const { body } = req;
-    let data = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
-    body.dataCadastro = data;
+    let date = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
+    body.registrationDate = date;
 
     const conn = await connFactory();
-    const produtosDao = new ProdutosDao(conn);
+    const productsDao = new ProductsDao(conn);
 
-    await produtosDao.save(body);
+    await productsDao.save(body);
 
     res.status(statusCode.Created).send({
       message: messages.productCreated,
     });
+    conn.end();
   } catch (error) {
     next(error);
   }
@@ -63,17 +64,18 @@ const updateProduct = async (req, res, next) => {
     const {
       params: { id },
     } = req;
-    let data = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
-    body.dataAtualizacao = data;
+    let date = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
+    body.updateDate = date;
 
     const conn = await connFactory();
-    const produtosDao = new ProdutosDao(conn);
+    const productsDao = new ProductsDao(conn);
 
-    await produtosDao.save(body, id);
+    await productsDao.save(body, id);
 
     res.status(statusCode.Success).send({
       message: messages.productUpdated,
     });
+    conn.end();
   } catch (error) {
     next(error);
   }
