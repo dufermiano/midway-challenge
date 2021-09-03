@@ -29,7 +29,23 @@ const productsSchema = (req, res, next) => {
     tamanho: Joi.string().max(3).required(),
     tipo: Joi.string().required(),
     descricao: Joi.string().required(),
-  });
+  }).required();
+
+  validateRequest(req, res, next, schema);
+};
+
+const productsToUpdateSchema = (req, res, next) => {
+  const schema = Joi.object({
+    nome: Joi.string(),
+    valor: Joi.number(),
+    estoque: Joi.number().integer(),
+    tamanho: Joi.string().max(3),
+    tipo: Joi.string(),
+    descricao: Joi.string(),
+  })
+    .required()
+    .min(1);
+
   validateRequest(req, res, next, schema);
 };
 
@@ -43,4 +59,4 @@ const errorMiddleware = (_error, _req, res, _next) => {
   });
 };
 
-module.exports = { productsSchema, errorMiddleware };
+module.exports = { productsSchema, errorMiddleware, productsToUpdateSchema };

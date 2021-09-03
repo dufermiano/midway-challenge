@@ -19,8 +19,18 @@ class ProdutosDao {
     );
   }
 
-  async save(produto) {
-    return await this.connection.query('INSERT INTO Produtos SET ?', produto);
+  async save(produto, id) {
+    if (!id) {
+      console.log('INSERT OPERATION');
+      return await this.connection.query('INSERT INTO Produtos SET ?', produto);
+    }
+
+    console.log('UPDATE OPERATION');
+
+    return await this.connection.query('UPDATE Produtos SET ? WHERE id = ?', [
+      produto,
+      id,
+    ]);
   }
 }
 

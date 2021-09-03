@@ -1,6 +1,8 @@
 const moment = require('moment-timezone');
 const ProdutosDao = require('../dao/ProdutosDao');
 const connFactory = require('../conectionFactory');
+const statusCode = require('../constants/statusCode');
+const { messages } = require('../constants/messages');
 
 const getProducts = async (req, res, next) => {
   try {
@@ -9,7 +11,7 @@ const getProducts = async (req, res, next) => {
 
     const [rows] = await produtosDao.getAll();
 
-    res.status(200).json(rows);
+    res.status(statusCode.Success).json(rows);
 
     conn.end();
   } catch (error) {
@@ -28,7 +30,7 @@ const getProductsById = async (req, res, next) => {
 
     const [rows] = await produtosDao.getById(id);
 
-    res.status(200).json(rows);
+    res.status(statusCode.Success).json(rows);
 
     conn.end();
   } catch (error) {
@@ -47,8 +49,30 @@ const createProduct = async (req, res, next) => {
 
     await produtosDao.save(body);
 
-    res.status(202).send({
-      message: 'Produto criado com sucesso',
+    res.status(statusCode.Created).send({
+      message: messages.productCreated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateProduct = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const {
+      params: { id },
+    } = req;
+    let data = moment.tz(process.env.TIMEZONE_SAO_PAULO).format();
+    body.dataAtualizacao = data;
+
+    const conn = await connFactory();
+    const produtosDao = new ProdutosDao(conn);
+
+    await produtosDao.save(body, id);
+
+    res.status(statusCode.Success).send({
+      message: messages.productUpdated,
     });
   } catch (error) {
     next(error);
@@ -59,8 +83,5 @@ module.exports = {
   getProducts,
   getProductsById,
   createProduct,
+  updateProduct,
 };
-
-//   app.get('/produtos/form', (req, res) => {
-//     res.render('produtos/form');
-//   });
