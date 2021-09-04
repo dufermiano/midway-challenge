@@ -18,8 +18,7 @@
     }
   ],
   "schemes": [
-    "http",
-    "https"
+    "http"
   ],
   "consumes": [
     "application/json"
@@ -152,6 +151,21 @@
             },
             "description": "Product found"
           },
+          "404": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Produto não encontrado"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "description": "Product not found"
+          },
           "500": {
             "schema": {
               "type": "object",
@@ -213,6 +227,21 @@
             },
             "description": "Product updated"
           },
+          "404": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Produto não encontrado"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "description": "Product Not Found"
+          },
           "500": {
             "schema": {
               "type": "object",
@@ -254,7 +283,22 @@
             "schema": {
               "$ref": "#/definitions/ProductSanitized"
             },
-            "description": "Products sanitized"
+            "description": "Products sanitized and before sanitized. Shows Products Model"
+          },
+          "202": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Não existem duplicações na base"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            },
+            "description": "No duplicates in database"
           },
           "500": {
             "schema": {

@@ -12,7 +12,7 @@ const doc = {
   },
   host: 'localhost:3000',
   basePath: '/',
-  schemes: ['http', 'https'],
+  schemes: ['http'],
   consumes: ['application/json'],
   produces: ['application/json'],
   tags: [
@@ -67,6 +67,4 @@ const doc = {
   },
 };
 
-swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
-  require('./index.js');
-});
+swaggerAutogen(outputFile, endpointsFiles, doc).then();

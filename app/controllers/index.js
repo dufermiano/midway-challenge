@@ -25,9 +25,9 @@ const getProducts = async (req, res, next) => {
 
     const [rows] = await productsDao.getAll();
 
-    res.status(statusCode.Success).json(rows);
-
     conn.end();
+
+    return res.status(statusCode.Success).json(rows);
   } catch (error) {
     next(error);
   }
@@ -42,6 +42,10 @@ const getProductsById = async (req, res, next) => {
      #swagger.responses[200] = { 
                schema: { $ref: "#/definitions/ProductBody" },
                description: 'Product found' 
+    }
+     #swagger.responses[404] = { 
+               schema: { message: 'Produto não encontrado'},
+               description: 'Product not found' 
     }
     #swagger.responses[500] = { 
         schema: { error: true, message: 'Ocorreu um erro em nossos sistemas. Tente novamente mais tarde.' },
@@ -59,9 +63,14 @@ const getProductsById = async (req, res, next) => {
 
     const [rows] = await productsDao.getById(id);
 
-    res.status(statusCode.Success).json(rows);
-
+    if (rows.length > 0) {
+      return res.status(statusCode.Success).json(rows);
+    }
     conn.end();
+
+    return res
+      .status(statusCode.NotFound)
+      .json({ message: messages.productNotFound });
   } catch (error) {
     next(error);
   }
@@ -97,10 +106,11 @@ const createProduct = async (req, res, next) => {
 
     await productsDao.save(body);
 
-    res.status(statusCode.Created).send({
+    conn.end();
+
+    return res.status(statusCode.Created).send({
       message: messages.productCreated,
     });
-    conn.end();
   } catch (error) {
     next(error);
   }
@@ -124,6 +134,11 @@ const updateProduct = async (req, res, next) => {
                schema: { message: 'Produto alterado com sucesso'},
                description: 'Product updated' 
     } 
+    
+    #swagger.responses[404] = { 
+               schema: { message: 'Produto não encontrado'},
+               description: 'Product Not Found'
+    } 
 
     #swagger.responses[500] = { 
         schema: { error: true, message: 'Ocorreu um erro em nossos sistemas. Tente novamente mais tarde.' },
@@ -141,12 +156,20 @@ const updateProduct = async (req, res, next) => {
     const conn = await connFactory();
     const productsDao = new ProductsDao(conn);
 
-    await productsDao.save(body, id);
+    const [rows] = await productsDao.getById(id);
 
-    res.status(statusCode.Success).send({
-      message: messages.productUpdated,
-    });
+    if (rows.length > 0) {
+      await productsDao.save(body, id);
+
+      return res.status(statusCode.Success).send({
+        message: messages.productUpdated,
+      });
+    }
     conn.end();
+
+    return res
+      .status(statusCode.NotFound)
+      .json({ message: messages.productNotFound });
   } catch (error) {
     next(error);
   }
@@ -160,7 +183,11 @@ const removeDuplicates = async (req, res, next) => {
 
     #swagger.responses[200] = { 
             schema: { $ref: "#/definitions/ProductSanitized" },
-            description: 'Products sanitized'
+            description: 'Products sanitized and before sanitized. Shows Products Model'
+    } 
+    #swagger.responses[202] = { 
+            schema: { message: 'Não existem duplicações na base' },
+            description: 'No duplicates in database'
     } 
 
     #swagger.responses[500] = { 
@@ -180,6 +207,12 @@ const removeDuplicates = async (req, res, next) => {
       _rows
     );
 
+    if (!idsToUpdate.length > 0) {
+      return res
+        .status(statusCode.Accepted)
+        .json({ message: messages.noDuplicates });
+    }
+
     const productsToUpdate = sanitizedProducts.filter((product) => {
       if (idsToUpdate.includes(product.id)) {
         return product;
@@ -194,11 +227,11 @@ const removeDuplicates = async (req, res, next) => {
     // remove duplicates
     await productsDao.delete();
 
-    res
+    conn.end();
+
+    return res
       .status(statusCode.Success)
       .json({ productsBeforeSanitize: _rows, sanitizedProducts });
-
-    conn.end();
   } catch (error) {
     next(error);
   }
@@ -244,53 +277,53 @@ const purchase = async (req, res, next) => {
     const _rows = Object.values(JSON.parse(JSON.stringify(rows)));
 
     if (_rows.length === 0) {
-      res.status(statusCode.NotFound).send({
+      conn.end();
+
+      return res.status(statusCode.NotFound).send({
         message: errorMessages.productNotFound,
       });
-
-      conn.end();
     }
 
     const hasProduct = _rows.find((product) => product.inventory > 0);
 
     if (!hasProduct) {
-      res.status(statusCode.Accepted).send({
+      conn.end();
+
+      return res.status(statusCode.Accepted).send({
         message: messages.productHasNoInventory,
       });
-
-      conn.end();
-    } else {
-      const product = Object.assign(..._rows);
-
-      const invoice = await generateInvoice(product.id, body.customerCPF);
-
-      invoice.isActive = 1;
-
-      --product.inventory;
-      delete product.registrationDate;
-      delete product.updateDate;
-
-      // create purchase
-
-      const purchaseDao = new PurchaseDao(conn);
-
-      await purchaseDao.save(invoice);
-
-      // update product inventory
-      await productsDao.save(product);
-
-      res.status(statusCode.Created).send({
-        message: messages.successPurchase,
-        invoice,
-        productPurchased: {
-          productId: product.id,
-          productName: product.name,
-          productSize: product.size,
-          productDescription: product.description,
-        },
-      });
-      conn.end();
     }
+    const product = Object.assign(..._rows);
+
+    const invoice = await generateInvoice(product.id, body.customerCPF);
+
+    invoice.isActive = 1;
+
+    --product.inventory;
+    delete product.registrationDate;
+    delete product.updateDate;
+
+    // create purchase
+
+    const purchaseDao = new PurchaseDao(conn);
+
+    await purchaseDao.save(invoice);
+
+    // update product inventory
+    await productsDao.save(product);
+
+    conn.end();
+
+    return res.status(statusCode.Created).send({
+      message: messages.successPurchase,
+      invoice,
+      productPurchased: {
+        productId: product.id,
+        productName: product.name,
+        productSize: product.size,
+        productDescription: product.description,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -328,41 +361,43 @@ const devolution = async (req, res, next) => {
     const purchaseRows = Object.values(JSON.parse(JSON.stringify(rows)));
 
     if (purchaseRows.length === 0) {
-      res.status(statusCode.NotFound).send({
+      conn.end();
+
+      return res.status(statusCode.NotFound).send({
         message: errorMessages.invoiceNotFound,
       });
-
-      conn.end();
-    } else {
-      const invoice = Object.assign(...purchaseRows);
-      const productsDao = new ProductsDao(conn);
-
-      const [rows] = await productsDao.getProductByInvoiceId(invoice.invoiceId);
-
-      const product = Object.assign(...rows);
-
-      if (product.length === 0) {
-        res.status(statusCode.NotFound).send({
-          message: errorMessages.productNotFound,
-        });
-
-        conn.end();
-      }
-
-      invoice.isActive = 0;
-
-      ++product.inventory;
-
-      await purchaseDao.save(invoice);
-
-      // update product inventory
-      await productsDao.save(product);
-
-      res.status(statusCode.Success).send({
-        message: messages.successDevolution,
-      });
-      conn.end();
     }
+    const invoice = Object.assign(...purchaseRows);
+    const productsDao = new ProductsDao(conn);
+
+    const [products] = await productsDao.getProductByInvoiceId(
+      invoice.invoiceId
+    );
+
+    const product = Object.assign(...products);
+
+    if (product.length === 0) {
+      conn.end();
+
+      return res.status(statusCode.NotFound).send({
+        message: errorMessages.productNotFound,
+      });
+    }
+
+    invoice.isActive = 0;
+
+    ++product.inventory;
+
+    await purchaseDao.save(invoice);
+
+    // update product inventory
+    await productsDao.save(product);
+
+    conn.end();
+
+    return res.status(statusCode.Success).send({
+      message: messages.successDevolution,
+    });
   } catch (error) {
     next(error);
   }

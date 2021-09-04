@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./swagger.js');
 const express = require('express');
 const cors = require('cors');
 const routes = require('./app/routes');
@@ -25,7 +26,7 @@ app.use(
 app.get('/', (_req, res) => {
   // #swagger.description = 'Root route, healthcheck'
 
-  res.status(200).send('It works');
+  return res.status(200).send('It works');
 });
 
 app.use(routes);

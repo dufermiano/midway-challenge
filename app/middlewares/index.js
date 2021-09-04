@@ -10,7 +10,7 @@ const validateRequest = (req, res, next, schema) => {
   };
   const { error, value } = schema.validate(req.body, options);
   if (error) {
-    res.status(statusCode.BadRequest).send({
+    return res.status(statusCode.BadRequest).send({
       error: true,
       message: `Validation error: ${error.details
         .map((x) => x.message)
@@ -63,7 +63,7 @@ const purchaseSchema = (req, res, next) => {
 const errorMiddleware = (_error, _req, res, _next) => {
   console.log(errorMessages.serverError, _error);
 
-  res.status(statusCode.InternalServerError).send({
+  return res.status(statusCode.InternalServerError).send({
     error: true,
     message: errorMessages.internalError,
   });

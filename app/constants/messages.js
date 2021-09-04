@@ -3,6 +3,8 @@ const messages = {
   productUpdated: 'Produto alterado com sucesso.',
   successPurchase: 'Compra realizada com sucesso.',
   productHasNoInventory: 'Desculpe. Esse produto está esgotado.',
+  productNotFound: 'Produto não encontrado.',
+  noDuplicates: 'Não existem duplicações na base',
   successDevolution: 'Devolução realizada com sucesso.',
 };
 
