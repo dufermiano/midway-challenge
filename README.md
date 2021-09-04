@@ -39,11 +39,3 @@ Existe uma collection do [Postman](https://www.postman.com/) na pasta [./docs](.
 ## Rotas da aplicação
 
 Na rota http://localhost:3000/docs, você pode encontrar a documentação do [Swagger](https://swagger.io/) com todas as rotas, suas entradas e saídas esperadas.
-
-## Executar Testes
-
-Para passar as suítes de testes Mocha execute:
-
-```
-npm run test
-```
