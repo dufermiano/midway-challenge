@@ -2,7 +2,6 @@
 
 Desafio técnico Midway - Eduardo Fermiano (dufermiano43@gmail.com)
 
-![100% test coverage](https://img.shields.io/badge/coverage-100-green.svg)
 ![node-lts](https://img.shields.io/badge/Node.js-43853D)
 
 Projeto que visa resolver dois [problemas](./docs/Problema.md):
