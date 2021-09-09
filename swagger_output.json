@@ -140,7 +140,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "int",
+            "type": "string",
             "description": "Product Id"
           }
         ],
@@ -197,7 +197,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "int",
+            "type": "string",
             "description": "Product Id"
           },
           {
@@ -274,8 +274,8 @@
           {
             "name": "id",
             "description": "Product Id",
-            "type": "int",
-            "in": "query"
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {

@@ -36,7 +36,7 @@ const getProductsById = async (req, res, next) => {
   /* 
      #swagger.tags = ['Products']
      #swagger.description = 'Get a product by its id'
-     #swagger.parameters['id'] = { description: 'Product Id',  type: 'int'}
+     #swagger.parameters['id'] = { description: 'Product Id'}
 
      #swagger.responses[200] = { 
                schema: { $ref: "#/definitions/ProductBody" },
@@ -119,7 +119,7 @@ const updateProduct = async (req, res, next) => {
   /* 
    #swagger.tags = ['Products']
    #swagger.description = 'Update a product passing the values contained on the models'
-   #swagger.parameters['id'] = { description: 'Product Id',  type: 'int'} 
+   #swagger.parameters['id'] = { description: 'Product Id'} 
 
    #swagger.parameters['body'] = {
                in: 'body',
@@ -178,7 +178,7 @@ const removeDuplicates = async (req, res, next) => {
   /* 
    #swagger.tags = ['Products']
    #swagger.description = 'Remove the products duplicated'
-   #swagger.parameters['id'] = { description: 'Product Id',  type: 'int'} 
+   #swagger.parameters['id'] = { description: 'Product Id'} 
 
     #swagger.responses[200] = { 
             schema: { $ref: "#/definitions/ProductSanitized" },
