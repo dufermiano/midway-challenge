@@ -63,7 +63,11 @@ const getProductsById = async (req, res, next) => {
     const [rows] = await productsDao.getById(id);
 
     if (rows.length > 0) {
-      return res.status(statusCode.Success).json(rows);
+      const _rows = Object.values(JSON.parse(JSON.stringify(rows)));
+
+      const product = Object.assign(..._rows);
+
+      return res.status(statusCode.Success).json(product);
     }
     conn.end();
 
