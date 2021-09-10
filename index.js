@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('./swagger.js');
 const express = require('express');
 const cors = require('cors');
 const routes = require('./app/routes');
