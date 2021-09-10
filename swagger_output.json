@@ -270,14 +270,7 @@
           "Products"
         ],
         "description": "Remove the products duplicated",
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Product Id",
-            "in": "query",
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "schema": {
@@ -336,7 +329,21 @@
             "required": true,
             "type": "object",
             "schema": {
-              "$ref": "#/definitions/Purchase"
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "number",
+                  "example": 3
+                },
+                "customerCPF": {
+                  "type": "string",
+                  "example": "487.459.470-07"
+                },
+                "id": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
             }
           }
         ],

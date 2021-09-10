@@ -162,7 +162,8 @@ const updateProduct = async (req, res, next) => {
     const [rows] = await productsDao.getById(id);
 
     if (rows.length > 0) {
-      await productsDao.save(body, id);
+      body.id = id;
+      await productsDao.save(body);
 
       return res.status(statusCode.Success).send({
         message: messages.productUpdated,
@@ -182,7 +183,6 @@ const removeDuplicates = async (req, res, next) => {
   /* 
    #swagger.tags = ['Products']
    #swagger.description = 'Remove the products duplicated'
-   #swagger.parameters['id'] = { description: 'Product Id'} 
 
     #swagger.responses[200] = { 
             schema: { $ref: "#/definitions/ProductSanitized" },

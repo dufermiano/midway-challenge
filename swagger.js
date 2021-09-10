@@ -68,5 +68,5 @@ const doc = {
 };
 
 swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
-  require('index.js');
+  require('./index.js');
 });

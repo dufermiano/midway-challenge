@@ -15,7 +15,11 @@ const purchase = async (req, res, next) => {
                  description: 'Purchase information.',
                  required: true,
                  type: 'object',
-                 schema: { $ref: "#/definitions/Purchase" }
+                 schema: {
+                    "productId": 3,
+                    "customerCPF": "487.459.470-07",
+                    "id": 1,
+                }
       }
   
       #swagger.responses[200] = { 
@@ -83,7 +87,7 @@ const purchase = async (req, res, next) => {
 
     conn.end();
 
-    return res.status(statusCode.Created).send({
+    return res.status(statusCode.Success).send({
       message: messages.successPurchase,
       invoice,
       productPurchased: {
